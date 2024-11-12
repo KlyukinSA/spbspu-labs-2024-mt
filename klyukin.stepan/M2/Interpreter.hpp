@@ -19,7 +19,8 @@ namespace klyukin
       void createSet();
       void showCircle();
       void showSet();
-      void printCircle(const Circle& circle);
+      void getCircleFrame();
+      void getSetFrame();
 
     private:
       ClientData data_;

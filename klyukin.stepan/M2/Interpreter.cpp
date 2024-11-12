@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <limits>
+#include "math.hpp"
 
 klyukin::Interpreter::Interpreter(std::istream& in, std::ostream& out, ClientData&& data):
   data_(std::move(data)),
@@ -60,6 +61,10 @@ void klyukin::Interpreter::createSet()
     }
     set.insert(circle);
   }
+  if (count != setSize) {
+    out_ << "incorrect set-size\n";
+    return;
+  }
   data_.sets[name] = std::move(set);
 }
 
@@ -89,6 +94,31 @@ void klyukin::Interpreter::showSet()
   }
 }
 
+void klyukin::Interpreter::getCircleFrame()
+{
+  std::string name;
+  in_ >> name;
+  auto circle = data_.circles.find(name);
+  if (circle == data_.circles.end()) {
+    out_ << "circle not exists\n";
+    return;
+  }
+  out_ << getBoundingRect(circle->second);
+}
+
+void klyukin::Interpreter::getSetFrame() // TODO repetition
+{
+  std::string name;
+  in_ >> name;
+  auto set = data_.sets.find(name);
+  if (set == data_.sets.end()) {
+    out_ << "set not exists\n";
+    return;
+  }
+  out_ << getBoundingRect(set->second, data_.circles);
+}
+
+
 
 const std::map< std::string, void (klyukin::Interpreter::*)() >
   klyukin::Interpreter::commandsMap =
@@ -96,7 +126,9 @@ const std::map< std::string, void (klyukin::Interpreter::*)() >
   {"circle", &Interpreter::createCircle},
   {"set", &Interpreter::createSet},
   {"show", &Interpreter::showCircle},
-  {"showset", &Interpreter::showSet}
+  {"showset", &Interpreter::showSet},
+  {"frame", &Interpreter::getCircleFrame},
+  {"frameset", &Interpreter::getSetFrame}
 };
 
 void klyukin::Interpreter::runLoop(const char* prompt)
