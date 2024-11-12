@@ -15,8 +15,11 @@ namespace klyukin
       Interpreter(std::istream& in, std::ostream& out, ClientData&& data);
       void runLoop(const char* prompt);
 
-      void increase();
-      void getCurrentValue();
+      void createCircle();
+      void createSet();
+      void showCircle();
+      void showSet();
+      void printCircle(const Circle& circle);
 
     private:
       ClientData data_;

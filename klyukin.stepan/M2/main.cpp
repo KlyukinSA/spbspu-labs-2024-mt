@@ -1,5 +1,5 @@
 #include <iostream>
-#include <fstream>
+
 #include "Interpreter.hpp"
 
 int main(int argc, const char* argv[])
@@ -10,7 +10,7 @@ int main(int argc, const char* argv[])
   }
   std::srand(seed);
 
-  klyukin::Interpreter interpreter(std::cin, std::cout, klyukin::ClientData{0});
+  klyukin::Interpreter interpreter(std::cin, std::cout, klyukin::ClientData{seed, std::unordered_map< std::string, klyukin::Circle >(), std::unordered_map< std::string, std::unordered_set< std::string >>()});
   interpreter.runLoop("> ");
   return 0;
 }

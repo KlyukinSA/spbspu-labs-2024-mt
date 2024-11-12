@@ -9,31 +9,94 @@ klyukin::Interpreter::Interpreter(std::istream& in, std::ostream& out, ClientDat
   out_(out)
 {}
 
-void klyukin::Interpreter::increase()
+void klyukin::Interpreter::createCircle()
 {
-  std::size_t n;
-  in_ >> n;
-  if (in_)
+  std::string name;
+  int r, x, y;
+  in_ >> name >> r >> x >> y;
+  if (!in_ || r < 1)
   {
-    data_.value += n;
-  }
-  else
-  {
-    out_ << "give nubmer\n";
+    out_ << "incorrect number\n";
     in_.clear();
+    return;
+  }
+  if (data_.circles.find(name) != data_.circles.end()) {
+    out_ << "circle exists\n";
+    return;
+  }
+  data_.circles[name] = std::move(Circle{r, x, y});
+}
+
+void klyukin::Interpreter::createSet()
+{
+  std::string name;
+  int setSize;
+  in_ >> name >> setSize;
+  if (!in_)
+  {
+    out_ << "incorrect number\n";
+    in_.clear();
+    return;
+  }
+  if (data_.sets.find(name) != data_.sets.end()) {
+    out_ << "set exists\n";
+    return;
+  }
+  std::string line;
+  std::getline(in_, line);
+  std::size_t pos1 = 1;
+  std::size_t pos2 = line.find(' ', pos1);
+  int count = 0;
+  std::unordered_set< std::string > set;
+  while (pos1 != std::string::npos && pos2 > pos1)
+  {
+    std::string circle = line.substr(pos1, pos2 - pos1);
+    pos1 = pos2 + 1;
+    pos2 = line.find(' ', pos1);
+    count++;
+    if (data_.circles.find(circle) == data_.circles.end()) {
+      out_ << "circle not exists\n";
+      return;
+    }
+    set.insert(circle);
+  }
+  data_.sets[name] = std::move(set);
+}
+
+void klyukin::Interpreter::showCircle()
+{
+  std::string name;
+  in_ >> name;
+  auto circle = data_.circles.find(name);
+  if (circle == data_.circles.end()) {
+    out_ << "circle not exists\n";
+    return;
+  }
+  out_ << circle->second;
+}
+
+void klyukin::Interpreter::showSet()
+{
+  std::string name;
+  in_ >> name;
+  auto set = data_.sets.find(name);
+  if (set == data_.sets.end()) {
+    out_ << "set not exists\n";
+    return;
+  }
+  for (auto circle: set->second) {
+    out_ << data_.circles.find(circle)->second;
   }
 }
 
-void klyukin::Interpreter::getCurrentValue()
-{
-  out_ << data_.value << "\n";
-}
 
 const std::map< std::string, void (klyukin::Interpreter::*)() >
   klyukin::Interpreter::commandsMap =
 {
-  {"inc", &Interpreter::increase},
-  {"get", &Interpreter::getCurrentValue}
+  {"circle", &Interpreter::createCircle},
+  {"set", &Interpreter::createSet},
+  {"show", &Interpreter::showCircle},
+  {"showset", &Interpreter::showSet}
 };
 
 void klyukin::Interpreter::runLoop(const char* prompt)
