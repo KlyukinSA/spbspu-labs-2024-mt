@@ -3,6 +3,7 @@
 #include <vector>
 #include <unistd.h>
 #include <fcntl.h>
+#include "math.hpp"
 
 #include <iostream>
 
@@ -75,10 +76,7 @@ klyukin::AreaCalculation::AreaCalculation(const std::unordered_set< std::string 
     //   std::cout << circle << ' ';
     // }
     // std::cout << '\n';
-    threads++;
-    tries++;
-    // const double area = calculateArea(setCircles.begin(), setCircles.end(), threads, tries);
-    const double area = 1.1;
+    const double area = calculateArea(setCircles.begin(), setCircles.end(), threads, tries);
     const char* raw = reinterpret_cast< const char* >(&area);
     bytes = 0;
     while (bytes < sizeof(area)) {
