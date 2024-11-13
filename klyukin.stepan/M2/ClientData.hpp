@@ -5,6 +5,7 @@
 #include <unordered_set>
 #include <string>
 #include "Circle.hpp"
+#include "AreaCalculation.hpp"
 
 namespace klyukin
 {
@@ -15,6 +16,7 @@ namespace klyukin
     int seed;
     std::unordered_map< std::string, Circle > circles;
     std::unordered_map< std::string, std::unordered_set< std::string >> sets;
+    std::unordered_map< std::string, AreaCalculation > calculations;
   };
 }
 

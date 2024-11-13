@@ -21,6 +21,8 @@ namespace klyukin
       void showSet();
       void getCircleFrame();
       void getSetFrame();
+      void startAreaCalculation();
+      void requestCalculationResult();
 
     private:
       ClientData data_;

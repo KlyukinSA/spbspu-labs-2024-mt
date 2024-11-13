@@ -9,7 +9,7 @@
 namespace klyukin
 {
   BoundingRect getBoundingRect(const Circle& circle);
-  BoundingRect getBoundingRect(const std::unordered_set< std::string >& set, std::unordered_map< std::string, Circle > circles);
+  BoundingRect getBoundingRect(const std::unordered_set< std::string >& set, const std::unordered_map< std::string, Circle >& circles);
 }
 
 #endif

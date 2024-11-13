@@ -8,7 +8,7 @@ klyukin::BoundingRect klyukin::getBoundingRect(const klyukin::Circle& circle)
   return BoundingRect{circle.x - circle.r, circle.y - circle.r, circle.x + circle.r, circle.y + circle.r};
 }
 
-klyukin::BoundingRect klyukin::getBoundingRect(const std::unordered_set< std::string >& set, std::unordered_map< std::string, klyukin::Circle > circles)
+klyukin::BoundingRect klyukin::getBoundingRect(const std::unordered_set< std::string >& set, const std::unordered_map< std::string, Circle >& circles)
 {
   klyukin::BoundingRect res{std::numeric_limits<int>::max(), std::numeric_limits<int>::max(), std::numeric_limits<int>::min(), std::numeric_limits<int>::min()};
   for (auto circleName: set) {

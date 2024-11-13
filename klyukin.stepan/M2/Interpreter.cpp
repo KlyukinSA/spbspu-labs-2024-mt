@@ -3,6 +3,7 @@
 #include <string>
 #include <limits>
 #include "math.hpp"
+#include "AreaCalculation.hpp"
 
 klyukin::Interpreter::Interpreter(std::istream& in, std::ostream& out, ClientData&& data):
   data_(std::move(data)),
@@ -118,7 +119,34 @@ void klyukin::Interpreter::getSetFrame() // TODO repetition
   out_ << getBoundingRect(set->second, data_.circles);
 }
 
+void klyukin::Interpreter::startAreaCalculation()
+{
+  std::string calculationName, setName;
+  int threads, tries;
+  in_ >> calculationName >> setName >> threads >> tries;
+  if (data_.calculations.find(calculationName) != data_.calculations.end()) {
+    out_ << "calculation exists\n";
+    return;
+  }
+  auto set = data_.sets.find(setName);
+  if (set == data_.sets.end()) {
+    out_ << "set not exists\n";
+    return;
+  }
+  data_.calculations[calculationName] = std::move(AreaCalculation{set->second, threads, tries, data_.circles});
+}
 
+void klyukin::Interpreter::requestCalculationResult()
+{
+  std::string calculationName;
+  in_ >> calculationName;
+  auto calculation = data_.calculations.find(calculationName);
+  if (calculation == data_.calculations.end()) {
+    out_ << "calculation not exists\n";
+    return;
+  }
+  out_ << calculation->second.requestCalculationResult() << '\n';
+}
 
 const std::map< std::string, void (klyukin::Interpreter::*)() >
   klyukin::Interpreter::commandsMap =
@@ -128,7 +156,9 @@ const std::map< std::string, void (klyukin::Interpreter::*)() >
   {"show", &Interpreter::showCircle},
   {"showset", &Interpreter::showSet},
   {"frame", &Interpreter::getCircleFrame},
-  {"frameset", &Interpreter::getSetFrame}
+  {"frameset", &Interpreter::getSetFrame},
+  {"area", &Interpreter::startAreaCalculation},
+  {"wait", &Interpreter::requestCalculationResult}
 };
 
 void klyukin::Interpreter::runLoop(const char* prompt)
@@ -156,7 +186,7 @@ void klyukin::Interpreter::runLoop(const char* prompt)
     }
     catch(const std::exception& e)
     {
-      out_ << e.what() << '\n';
+      out_ << "exception " << e.what() << '\n';
     }
     if (invite)
     {
