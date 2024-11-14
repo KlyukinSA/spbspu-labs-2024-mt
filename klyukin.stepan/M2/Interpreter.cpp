@@ -151,7 +151,7 @@ void klyukin::Interpreter::requestCalculationResult(bool blocking)
     out_ << "IN PROGRESS\n";
   } else {
     out_ << res << '\n';
-  }
+  } // сохранять полученные результаты расчетов
 }
 
 void klyukin::Interpreter::getCalculationResultIfExistsOrElseStatus()

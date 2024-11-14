@@ -5,7 +5,7 @@
 #include <fcntl.h>
 #include "math.hpp"
 
-#include <iostream>
+#include <iostream> // 
 
 klyukin::AreaCalculation::AreaCalculation(const std::unordered_set< std::string >& set, int threads, int tries, const std::unordered_map< std::string, klyukin::Circle >& circles)
 {
@@ -91,6 +91,7 @@ klyukin::AreaCalculation::AreaCalculation(const std::unordered_set< std::string 
     close(pipe2_fds[1]);
     exit(0); // TODO separate main()
   }
+  // Все расчеты должны выполняться в одном дочернем процессе.
 }
 
 bool klyukin::AreaCalculation::requestResult(double& res, bool blocking)

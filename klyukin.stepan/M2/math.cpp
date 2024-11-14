@@ -5,6 +5,8 @@
 #include <thread>
 #include <numeric>
 
+#include <iostream> //
+
 klyukin::BoundingRect klyukin::getBoundingRect(const klyukin::Circle& circle)
 {
   return BoundingRect{circle.x - circle.r, circle.y - circle.r, circle.x + circle.r, circle.y + circle.r};
@@ -53,13 +55,18 @@ namespace klyukin {
       for (auto circleIterator = dataBegin; circleIterator != dataEnd; ++circleIterator) {
         const double dx = circleIterator->x - x;
         const double dy = circleIterator->y - y;
-        *res += (dx * dx + dy * dy < circleIterator->r * circleIterator->r);
+        // std::cout << dx * dx + dy * dy << '\n';
+        if (dx * dx + dy * dy < circleIterator->r * circleIterator->r) {
+          *res += 1;
+          break;
+        }
       }
     }
   }
 
   static int getArea(const BoundingRect& rect)
   {
+    // std::cout << rect.x2  << ' ' << rect.x1  << '_' << rect.y2 << ' ' << rect.y1 << '\n';
     return (rect.x2 - rect.x1) * (rect.y2 - rect.y1);
   }
 }
