@@ -136,7 +136,7 @@ void klyukin::Interpreter::startAreaCalculation()
   data_.calculations[calculationName] = std::move(AreaCalculation{set->second, threads, tries, data_.circles});
 }
 
-void klyukin::Interpreter::requestCalculationResult()
+void klyukin::Interpreter::requestCalculationResult(bool blocking)
 {
   std::string calculationName;
   in_ >> calculationName;
@@ -145,7 +145,23 @@ void klyukin::Interpreter::requestCalculationResult()
     out_ << "calculation not exists\n";
     return;
   }
-  out_ << calculation->second.requestCalculationResult() << '\n';
+  double res = 0;
+  auto ret = calculation->second.requestResult(res, blocking);
+  if (!ret) {
+    out_ << "IN PROGRESS\n";
+  } else {
+    out_ << res << '\n';
+  }
+}
+
+void klyukin::Interpreter::getCalculationResultIfExistsOrElseStatus()
+{
+  requestCalculationResult(false);
+}
+
+void klyukin::Interpreter::getCalculationResult()
+{
+  requestCalculationResult(true);
 }
 
 const std::map< std::string, void (klyukin::Interpreter::*)() >
@@ -158,7 +174,8 @@ const std::map< std::string, void (klyukin::Interpreter::*)() >
   {"frame", &Interpreter::getCircleFrame},
   {"frameset", &Interpreter::getSetFrame},
   {"area", &Interpreter::startAreaCalculation},
-  {"wait", &Interpreter::requestCalculationResult}
+  {"status", &Interpreter::getCalculationResultIfExistsOrElseStatus},
+  {"wait", &Interpreter::getCalculationResult}
 };
 
 void klyukin::Interpreter::runLoop(const char* prompt)
@@ -186,7 +203,7 @@ void klyukin::Interpreter::runLoop(const char* prompt)
     }
     catch(const std::exception& e)
     {
-      out_ << "exception " << e.what() << '\n';
+      out_ << e.what() << '\n';
     }
     if (invite)
     {

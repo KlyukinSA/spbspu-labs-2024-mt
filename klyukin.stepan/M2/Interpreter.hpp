@@ -12,7 +12,9 @@ namespace klyukin
   {
     public:
       static const std::map< std::string, void (Interpreter::*)() > commandsMap;
+      
       Interpreter(std::istream& in, std::ostream& out, ClientData&& data);
+      
       void runLoop(const char* prompt);
 
       void createCircle();
@@ -22,12 +24,15 @@ namespace klyukin
       void getCircleFrame();
       void getSetFrame();
       void startAreaCalculation();
-      void requestCalculationResult();
+      void getCalculationResultIfExistsOrElseStatus();
+      void getCalculationResult();
 
     private:
       ClientData data_;
       std::istream& in_;
       std::ostream& out_;
+
+      void requestCalculationResult(bool blocking);
   };
 }
 

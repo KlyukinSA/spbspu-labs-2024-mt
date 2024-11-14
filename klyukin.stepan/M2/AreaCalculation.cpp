@@ -93,20 +93,40 @@ klyukin::AreaCalculation::AreaCalculation(const std::unordered_set< std::string 
   }
 }
 
-double klyukin::AreaCalculation::requestCalculationResult()
+bool klyukin::AreaCalculation::requestResult(double& res, bool blocking)
 {
-  double res = 1;
   char* raw = reinterpret_cast< char* >(&res);
+  if (!blocking) {
+    if (fcntl(resultFileDescriptor_, F_SETFL, O_NONBLOCK) < 0) {
+      throw std::system_error(errno, std::system_category(), "set flag nonblock failed");
+    }
+  }
   size_t bytes = 0;
   while (bytes < sizeof(res)) {
     int ret = read(resultFileDescriptor_, raw + bytes, sizeof(res) - bytes);
     if (ret < 0) {
-      // close(resultFileDescriptor_);
-      throw std::system_error(errno, std::system_category(), "read from pipe 2 failed");
+      int readErrno = errno;
+      if (blocking || readErrno != EAGAIN || readErrno != EWOULDBLOCK) {
+        close(resultFileDescriptor_);
+        throw std::system_error(readErrno, std::system_category(), "read from pipe 2 failed");
+      }
     } else {
       bytes += ret;
     }
+    if (!blocking && ret != 0) {
+      blocking = true;
+      int oldFlags = fcntl(resultFileDescriptor_, F_GETFL);
+      if (oldFlags == -1) {
+        throw std::system_error(errno, std::system_category(), "get old flags failed");
+      }
+      if (fcntl(resultFileDescriptor_, F_SETFL, oldFlags & ~O_NONBLOCK) < 0) {
+        throw std::system_error(errno, std::system_category(), "unset flag nonblock failed");
+      }
+      if (ret < 0) {
+        return false;
+      }
+    }
   }
-  // close(resultFileDescriptor_);
-  return res;
+  close(resultFileDescriptor_);
+  return true;
 }

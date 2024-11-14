@@ -15,7 +15,7 @@ namespace klyukin
     AreaCalculation():
       resultFileDescriptor_(-1)
     {}
-    double requestCalculationResult();
+    bool requestResult(double& res, bool blocking);
   private:
     int resultFileDescriptor_;
   };
